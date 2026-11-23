@@ -1,0 +1,12 @@
+{
+  "name": "trello-extensions",
+  "version": "1.0.0",
+  "description": "Monorepo de extensões e Power-Ups para o Trello",
+  "scripts": {
+    "start:subtasks": "npm --prefix extensions/subtasks start",
+    "dev:subtasks": "npm --prefix extensions/subtasks run dev"
+  },
+  "keywords": ["trello", "power-up", "subtasks", "extensions"],
+  "author": "Rodrigo Lipparelli",
+  "license": "MIT"
+}

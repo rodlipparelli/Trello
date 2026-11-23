@@ -1,0 +1,14 @@
+{
+  "name": "trello-subtasks-powerup",
+  "version": "1.0.0",
+  "description": "Power-Up do Trello para gerenciamento bidirecional de subtarefas e cálculo de progresso",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {},
+  "keywords": ["trello", "power-up", "subtasks", "hierarchy", "progress"],
+  "author": "Rodrigo Lipparelli",
+  "license": "MIT"
+}

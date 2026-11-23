@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vincular Card Existente</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Trello Power-Up Client Library -->
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body class="modal-body">
+  <div>
+    <input
+      type="text"
+      id="search-card-input"
+      class="search-box"
+      placeholder="Pesquisar cards neste quadro..."
+      autocomplete="off"
+    />
+    <div id="cards-container" class="cards-select-list">
+      <div id="loading" class="empty-state">Carregando cards do quadro...</div>
+    </div>
+  </div>
+
+  <script src="./js/link-modal.js"></script>
+</body>
+</html>

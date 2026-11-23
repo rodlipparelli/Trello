@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subtarefas</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Trello Power-Up Client Library -->
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <div id="container">
+    <!-- Banner exibido caso este card seja uma subtarefa de outro card -->
+    <div id="parent-card-banner" class="parent-banner" style="display: none;">
+      <div class="parent-info">
+        <span class="parent-icon">↳</span>
+        <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#" target="_blank">Card Mestre</a></span>
+      </div>
+      <button id="unlink-parent-btn" class="unlink-parent-btn" title="Desvincular deste card mestre">Desvincular</button>
+    </div>
+
+    <!-- Seção de Subtarefas do Card Atual -->
+    <div class="subtasks-section">
+      <div class="subtasks-header">
+        <div class="subtasks-title-wrapper">
+          <svg class="subtasks-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span class="subtasks-title">Subtarefas</span>
+        </div>
+        <span id="progress-stats" class="progress-stats">0 de 0 (0%)</span>
+      </div>
+
+      <!-- Barra de Medidor de Progresso -->
+      <div id="progress-bar-container" class="progress-bar-container" style="display: none;">
+        <div class="progress-bar-track">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <span id="progress-percentage" class="progress-percentage">0%</span>
+      </div>
+
+      <!-- Lista de Subtarefas -->
+      <ul id="subtasks-list" class="subtasks-list"></ul>
+      <div id="empty-state" class="empty-state" style="display: none;">Nenhuma subtarefa vinculada a este card.</div>
+
+      <!-- Ações de Adição e Vinculação -->
+      <div class="actions-container">
+        <form id="add-subtask-form" class="add-subtask-form">
+          <input
+            type="text"
+            id="subtask-input"
+            class="subtask-input"
+            placeholder="Adicionar uma nova subtarefa..."
+            autocomplete="off"
+          />
+          <button type="submit" class="primary-btn">Adicionar</button>
+        </form>
+
+        <div class="buttons-row">
+          <button id="link-existing-card-btn" class="secondary-btn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Vincular Card Existente
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/card-back.js"></script>
+</body>
+</html>
