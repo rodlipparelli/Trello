@@ -75,8 +75,17 @@ npx ngrok http 3000
 ```
 Copie a URL HTTPS gerada (exemplo: `https://seu-id.ngrok-free.app`).
 
-### Opção C: Deploy em Produção (GitHub Pages, Vercel ou Netlify)
-Você também pode subir os arquivos da pasta `public/` diretamente em um serviço de hospedagem estática gratuita com HTTPS automático.
+### Opção C: Deploy no GitHub Pages (Automático e Gratuito)
+Este repositório possui uma GitHub Action já configurada em [`.github/workflows/deploy-pages.yml`](../../.github/workflows/deploy-pages.yml).
+
+1. No repositório no GitHub, vá em **Settings** > **Pages**.
+2. Em **Build and deployment > Source**, escolha **GitHub Actions**.
+3. A cada push na branch `main`, o deploy será realizado automaticamente.
+4. A URL pública HTTPS do conector será:
+   ```text
+   https://<seu-usuario>.github.io/<nome-do-repositorio>/connector.html
+   ```
+
 
 ---
 
