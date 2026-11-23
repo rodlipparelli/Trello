@@ -6,7 +6,9 @@ let currentCard = null;
 let currentSubtasks = [];
 let parentInfo = null;
 let boardLists = [];
+let boardCards = [];
 let boardCardsMap = new Map();
+let boardListsMap = new Map();
 
 // Elementos do DOM
 const parentContainer = document.getElementById('parent-container');
@@ -16,6 +18,11 @@ const changeParentBtn = document.getElementById('change-parent-btn');
 const addParentRow = document.getElementById('add-parent-row');
 const addParentBtn = document.getElementById('add-parent-btn');
 
+const parentSelectPanel = document.getElementById('parent-select-panel');
+const searchParentInput = document.getElementById('search-parent-input');
+const parentCardsList = document.getElementById('parent-cards-list');
+const closeParentPanelBtn = document.getElementById('close-parent-panel-btn');
+
 const progressBarContainer = document.getElementById('progress-bar-container');
 const progressBarFill = document.getElementById('progress-bar-fill');
 const progressPercentage = document.getElementById('progress-percentage');
@@ -24,10 +31,12 @@ const progressStats = document.getElementById('progress-stats');
 const subtasksList = document.getElementById('subtasks-list');
 const emptyState = document.getElementById('empty-state');
 
-const addSubtaskForm = document.getElementById('add-subtask-form');
-const subtaskInput = document.getElementById('subtask-input');
+const subtaskSelectPanel = document.getElementById('subtask-select-panel');
+const searchSubtaskInput = document.getElementById('search-subtask-input');
+const subtaskCardsList = document.getElementById('subtask-cards-list');
+const closeSubtaskPanelBtn = document.getElementById('close-subtask-panel-btn');
+const openSubtaskPanelBtn = document.getElementById('open-subtask-panel-btn');
 
-const linkExistingCardBtn = document.getElementById('link-existing-card-btn');
 const toggleThemeBtn = document.getElementById('toggle-theme-btn');
 const themeIcon = document.getElementById('theme-icon');
 
@@ -52,7 +61,7 @@ function toggleTheme() {
 
 initTheme();
 
-// Redimensionamento
+// Redimensionamento suave
 function resize() {
   setTimeout(() => {
     t.sizeTo('#container').catch(() => {});
@@ -93,8 +102,8 @@ function updateProgressBar() {
     if (st.cardId && boardCardsMap.has(st.cardId)) {
       const cardObj = boardCardsMap.get(st.cardId);
       if (cardObj.dueComplete) return true;
-      const listObj = boardLists.find((l) => l.id === cardObj.idList);
-      if (listObj && isDoneListName(listObj.name)) return true;
+      const listName = boardListsMap.get(cardObj.idList);
+      if (isDoneListName(listName)) return true;
     }
     return false;
   }).length;
@@ -116,7 +125,7 @@ function updateProgressBar() {
   }
 }
 
-// Renderiza subtarefas
+// Renderiza subtarefas vinculadas
 function renderSubtasks() {
   subtasksList.innerHTML = '';
 
@@ -133,10 +142,10 @@ function renderSubtasks() {
     if (subtask.cardId && boardCardsMap.has(subtask.cardId)) {
       const cardObj = boardCardsMap.get(subtask.cardId);
       if (cardObj.dueComplete) isCompleted = true;
-      const listObj = boardLists.find((l) => l.id === cardObj.idList);
-      if (listObj) {
-        currentListName = listObj.name;
-        if (isDoneListName(listObj.name)) isCompleted = true;
+      const listName = boardListsMap.get(cardObj.idList);
+      if (listName) {
+        currentListName = listName;
+        if (isDoneListName(listName)) isCompleted = true;
       }
     }
 
@@ -152,21 +161,21 @@ function renderSubtasks() {
     const titleLink = document.createElement('a');
     titleLink.className = `subtask-title-link ${isCompleted ? 'completed' : ''}`;
     titleLink.textContent = subtask.title;
-    titleLink.title = subtask.cardId ? 'Clique para abrir este cartão no Trello' : '';
+    titleLink.title = 'Clique para abrir este cartão no Trello';
 
-    if (subtask.cardId) {
-      titleLink.addEventListener('click', (e) => {
-        e.preventDefault();
+    titleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (subtask.cardId) {
         t.showCard(subtask.cardId);
-      });
-    }
+      }
+    });
 
     leftDiv.appendChild(checkbox);
     leftDiv.appendChild(titleLink);
 
     if (currentListName) {
       const listBadge = document.createElement('span');
-      listBadge.className = 'list-name-badge';
+      listBadge.className = 'card-picker-list-name';
       listBadge.textContent = currentListName;
       leftDiv.appendChild(listBadge);
     }
@@ -177,7 +186,7 @@ function renderSubtasks() {
     const unlinkBtn = document.createElement('button');
     unlinkBtn.className = 'subtask-btn';
     unlinkBtn.innerHTML = '✕';
-    unlinkBtn.title = 'Remover subtarefa';
+    unlinkBtn.title = 'Desvincular este cartão';
     unlinkBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       removeSubtask(subtask.id, subtask.cardId);
@@ -199,9 +208,9 @@ function renderParentSection() {
   if (parentInfo && parentInfo.parentId) {
     parentContainer.style.display = 'block';
     addParentRow.style.display = 'none';
+    parentSelectPanel.style.display = 'none';
 
     parentCardLink.textContent = parentInfo.parentTitle || 'Card Mestre';
-    parentCardLink.href = parentInfo.parentUrl || '#';
     parentCardLink.onclick = (e) => {
       e.preventDefault();
       t.showCard(parentInfo.parentId);
@@ -213,10 +222,167 @@ function renderParentSection() {
   resize();
 }
 
-// Salva subtarefas
-async function saveSubtasks() {
-  await t.set('card', 'shared', 'subtasks_data', { subtasks: currentSubtasks });
-  updateProgressBar();
+// Renderiza lista no painel de seleção de Pai
+function renderParentPicker(query = '') {
+  parentCardsList.innerHTML = '';
+  const q = query.toLowerCase().trim();
+
+  const available = boardCards.filter((c) => {
+    if (c.id === currentCard.id) return false;
+    if (c.closed) return false;
+    if (q && !c.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (available.length === 0) {
+    parentCardsList.innerHTML = '<div class="empty-state">Nenhum cartão encontrado.</div>';
+    resize();
+    return;
+  }
+
+  available.forEach((c) => {
+    const item = document.createElement('div');
+    item.className = 'card-picker-item';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'card-picker-name';
+    nameSpan.textContent = c.name;
+
+    const listSpan = document.createElement('span');
+    listSpan.className = 'card-picker-list-name';
+    listSpan.textContent = boardListsMap.get(c.idList) || '';
+
+    item.appendChild(nameSpan);
+    item.appendChild(listSpan);
+
+    item.addEventListener('click', async () => {
+      await setParentCard(c);
+    });
+
+    parentCardsList.appendChild(item);
+  });
+
+  resize();
+}
+
+// Renderiza lista no painel de seleção de Subtarefas
+function renderSubtaskPicker(query = '') {
+  subtaskCardsList.innerHTML = '';
+  const q = query.toLowerCase().trim();
+
+  const existingIds = new Set(currentSubtasks.map((st) => st.cardId).filter(Boolean));
+
+  const available = boardCards.filter((c) => {
+    if (c.id === currentCard.id) return false;
+    if (c.closed) return false;
+    if (existingIds.has(c.id)) return false;
+    if (q && !c.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (available.length === 0) {
+    subtaskCardsList.innerHTML = '<div class="empty-state">Nenhum outro cartão disponível.</div>';
+    resize();
+    return;
+  }
+
+  available.forEach((c) => {
+    const item = document.createElement('div');
+    item.className = 'card-picker-item';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'card-picker-name';
+    nameSpan.textContent = c.name;
+
+    const listSpan = document.createElement('span');
+    listSpan.className = 'card-picker-list-name';
+    listSpan.textContent = boardListsMap.get(c.idList) || '';
+
+    item.appendChild(nameSpan);
+    item.appendChild(listSpan);
+
+    item.addEventListener('click', async () => {
+      await linkCardAsSubtask(c);
+    });
+
+    subtaskCardsList.appendChild(item);
+  });
+
+  resize();
+}
+
+// Define um cartão como Pai (Mão-dupla)
+async function setParentCard(parentCard) {
+  try {
+    const subtaskId = `st_card_${currentCard.id}`;
+
+    // 1. Salva a referência do pai neste cartão filho
+    parentInfo = {
+      parentId: parentCard.id,
+      parentTitle: parentCard.name,
+      parentUrl: parentCard.url,
+      subtaskId: subtaskId,
+    };
+    await t.set('card', 'shared', 'subtask_parent', parentInfo);
+
+    // 2. Salva este cartão como subtarefa no cartão pai
+    try {
+      const parentData = await t.get(parentCard.id, 'shared', 'subtasks_data');
+      const pSubtasks = (parentData && Array.isArray(parentData.subtasks)) ? parentData.subtasks : [];
+      const filtered = pSubtasks.filter((st) => st.cardId !== currentCard.id);
+      filtered.push({
+        id: subtaskId,
+        cardId: currentCard.id,
+        title: currentCard.name,
+        url: currentCard.url,
+        completed: !!currentCard.dueComplete,
+        createdAt: new Date().toISOString(),
+      });
+      await t.set(parentCard.id, 'shared', 'subtasks_data', { subtasks: filtered });
+    } catch (err) {
+      console.warn('Aviso: atualização do pai:', err);
+    }
+
+    parentSelectPanel.style.display = 'none';
+    renderParentSection();
+  } catch (error) {
+    console.error('Erro ao definir cartão pai:', error);
+  }
+}
+
+// Vincula um cartão como subtarefa (Mão-dupla)
+async function linkCardAsSubtask(card) {
+  try {
+    const subtaskId = `st_card_${card.id}`;
+
+    currentSubtasks.push({
+      id: subtaskId,
+      cardId: card.id,
+      title: card.name,
+      url: card.url,
+      completed: !!card.dueComplete,
+      createdAt: new Date().toISOString(),
+    });
+
+    await t.set('card', 'shared', 'subtasks_data', { subtasks: currentSubtasks });
+
+    // Salva referência de pai no cartão filho
+    try {
+      await t.set(card.id, 'shared', 'subtask_parent', {
+        parentId: currentCard.id,
+        parentTitle: currentCard.name,
+        parentUrl: currentCard.url,
+        subtaskId: subtaskId,
+      });
+    } catch (err) {
+      console.warn('Aviso: definir parent no filho:', err);
+    }
+
+    subtaskSelectPanel.style.display = 'none';
+    renderSubtasks();
+  } catch (error) {
+    console.error('Erro ao vincular cartão como subtarefa:', error);
+  }
 }
 
 // Alterna status de conclusão
@@ -237,11 +403,12 @@ async function toggleSubtask(id) {
     }
   }
 
-  await saveSubtasks();
+  await t.set('card', 'shared', 'subtasks_data', { subtasks: currentSubtasks });
+  updateProgressBar();
   renderSubtasks();
 }
 
-// Remove/Desvincula subtarefa
+// Desvincula subtarefa
 async function removeSubtask(id, cardId) {
   currentSubtasks = currentSubtasks.filter((st) => st.id !== id);
 
@@ -253,11 +420,12 @@ async function removeSubtask(id, cardId) {
     }
   }
 
-  await saveSubtasks();
+  await t.set('card', 'shared', 'subtasks_data', { subtasks: currentSubtasks });
+  updateProgressBar();
   renderSubtasks();
 }
 
-// Desvincula do card pai
+// Desvincula do cartão pai
 async function unlinkFromParent() {
   if (!parentInfo || !parentInfo.parentId) return;
 
@@ -266,10 +434,10 @@ async function unlinkFromParent() {
   try {
     const parentData = await t.get(parentId, 'shared', 'subtasks_data');
     if (parentData && Array.isArray(parentData.subtasks)) {
-      const updatedParentSubtasks = parentData.subtasks.filter(
+      const updated = parentData.subtasks.filter(
         (st) => st.cardId !== currentCard.id && st.id !== parentInfo.subtaskId
       );
-      await t.set(parentId, 'shared', 'subtasks_data', { subtasks: updatedParentSubtasks });
+      await t.set(parentId, 'shared', 'subtasks_data', { subtasks: updated });
     }
   } catch (e) {
     console.warn('Erro ao atualizar card pai:', e);
@@ -278,25 +446,6 @@ async function unlinkFromParent() {
   await t.set('card', 'shared', 'subtask_parent', null);
   parentInfo = null;
   renderParentSection();
-}
-
-// Adiciona nova subtarefa diretamente
-async function addSubtask(title) {
-  const trimmed = title.trim();
-  if (!trimmed) return;
-
-  const newSubtask = {
-    id: `st_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-    title: trimmed,
-    completed: false,
-    cardId: null,
-    createdAt: new Date().toISOString(),
-  };
-
-  currentSubtasks.push(newSubtask);
-  await saveSubtasks();
-  subtaskInput.value = '';
-  renderSubtasks();
 }
 
 // Inicialização
@@ -314,11 +463,13 @@ async function init() {
 
     currentCard = card;
     boardLists = lists || [];
+    boardCards = cards || [];
 
     boardCardsMap.clear();
-    if (Array.isArray(cards)) {
-      cards.forEach((c) => boardCardsMap.set(c.id, c));
-    }
+    boardCards.forEach((c) => boardCardsMap.set(c.id, c));
+
+    boardListsMap.clear();
+    boardLists.forEach((l) => boardListsMap.set(l.id, l.name));
 
     currentSubtasks = (subtasksData && Array.isArray(subtasksData.subtasks)) ? subtasksData.subtasks : [];
     parentInfo = parentData || null;
@@ -331,40 +482,55 @@ async function init() {
 }
 
 // Event Listeners
-addSubtaskForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  await addSubtask(subtaskInput.value);
-  subtaskInput.focus();
+addParentBtn.addEventListener('click', () => {
+  const isHidden = parentSelectPanel.style.display === 'none';
+  parentSelectPanel.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    renderParentPicker();
+    searchParentInput.focus();
+  }
+  resize();
+});
+
+changeParentBtn.addEventListener('click', () => {
+  parentSelectPanel.style.display = 'block';
+  renderParentPicker();
+  searchParentInput.focus();
+  resize();
+});
+
+closeParentPanelBtn.addEventListener('click', () => {
+  parentSelectPanel.style.display = 'none';
+  resize();
+});
+
+searchParentInput.addEventListener('input', (e) => {
+  renderParentPicker(e.target.value);
 });
 
 unlinkParentBtn.addEventListener('click', async () => {
-  if (confirm('Deseja realmente desvincular este cartão do seu cartão mestre?')) {
+  if (confirm('Deseja realmente desvincular este cartão do seu cartão pai?')) {
     await unlinkFromParent();
   }
 });
 
-changeParentBtn.addEventListener('click', () => {
-  t.popup({
-    title: 'Alterar Cartão Pai (Parent)',
-    url: './link-modal.html?mode=parent&v=4',
-    height: 360,
-  });
+openSubtaskPanelBtn.addEventListener('click', () => {
+  const isHidden = subtaskSelectPanel.style.display === 'none';
+  subtaskSelectPanel.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    renderSubtaskPicker();
+    searchSubtaskInput.focus();
+  }
+  resize();
 });
 
-addParentBtn.addEventListener('click', () => {
-  t.popup({
-    title: 'Definir Cartão Pai (Add Parent)',
-    url: './link-modal.html?mode=parent&v=4',
-    height: 360,
-  });
+closeSubtaskPanelBtn.addEventListener('click', () => {
+  subtaskSelectPanel.style.display = 'none';
+  resize();
 });
 
-linkExistingCardBtn.addEventListener('click', () => {
-  t.popup({
-    title: 'Vincular Cartão do Quadro (Add Subtask)',
-    url: './link-modal.html?mode=subtask&v=4',
-    height: 360,
-  });
+searchSubtaskInput.addEventListener('input', (e) => {
+  renderSubtaskPicker(e.target.value);
 });
 
 toggleThemeBtn.addEventListener('click', toggleTheme);

@@ -1,5 +1,5 @@
 :root {
-  /* Tema Escuro Nativo do Trello */
+  /* Tema Escuro Nativo do Trello (Dark Mode) */
   --bg-page: #22272b;
   --bg-card: #1d2125;
   --bg-input: #22272b;
@@ -13,7 +13,7 @@
   --text-secondary: #9fadbc;
   --text-muted: #738496;
 
-  /* Cores de Destaque */
+  /* Destaques e Ações */
   --accent-color: #579dff;
   --accent-hover: #85b8ff;
   --accent-text: #1d2125;
@@ -179,6 +179,104 @@ body {
   color: var(--accent-color);
 }
 
+/* Painéis de Seleção Inline */
+.inline-card-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.inline-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.close-panel-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+.close-panel-btn:hover {
+  color: var(--text-primary);
+}
+
+.search-input {
+  width: 100%;
+  height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 12px;
+  outline: none;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.search-input:focus {
+  border-color: var(--accent-color);
+}
+
+.cards-picker-list {
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-button);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.card-picker-item:hover {
+  background-color: var(--bg-button-hover);
+  color: var(--accent-color);
+}
+
+.card-picker-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-picker-list-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+  background-color: var(--tag-bg);
+  border: 1px solid var(--border-subtle);
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
 /* Cabeçalho da Seção de Subtarefas */
 .subtasks-header {
   display: flex;
@@ -318,16 +416,6 @@ body {
   color: var(--text-muted);
 }
 
-.list-name-badge {
-  font-size: 11px;
-  color: var(--text-secondary);
-  background-color: var(--tag-bg);
-  border: 1px solid var(--border-subtle);
-  padding: 2px 6px;
-  border-radius: 3px;
-  white-space: nowrap;
-}
-
 .subtask-actions {
   display: flex;
   align-items: center;
@@ -347,51 +435,6 @@ body {
 .subtask-btn:hover {
   background-color: rgba(248, 113, 104, 0.2);
   color: var(--danger-color);
-}
-
-/* Linha Limpa para Adicionar Subtarefa */
-.add-form-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.subtask-input {
-  flex-grow: 1;
-  height: 36px;
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 13px;
-  outline: none;
-  background-color: var(--bg-input);
-  color: var(--text-primary);
-  transition: border-color 0.15s ease;
-}
-
-.subtask-input:focus {
-  border-color: var(--accent-color);
-}
-
-.subtask-input::placeholder {
-  color: var(--text-muted);
-}
-
-.primary-btn {
-  background-color: var(--accent-color);
-  color: var(--accent-text);
-  border: none;
-  border-radius: var(--border-radius);
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-  white-space: nowrap;
-}
-
-.primary-btn:hover {
-  opacity: 0.9;
 }
 
 .secondary-btn {
@@ -435,71 +478,6 @@ body {
 
 .toggle-theme-btn:hover {
   color: var(--text-primary);
-}
-
-/* Modal e Popups */
-.modal-body {
-  padding: 12px;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
-}
-
-.search-box {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 13px;
-  margin-bottom: 10px;
-  outline: none;
-  background-color: var(--bg-input);
-  color: var(--text-primary);
-}
-
-.search-box:focus {
-  border-color: var(--accent-color);
-}
-
-.cards-select-list {
-  max-height: 280px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.card-select-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.card-select-item:hover {
-  background-color: var(--bg-button);
-  border-color: var(--accent-color);
-}
-
-.card-select-title {
-  font-weight: 500;
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.card-select-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-select-list-name {
-  font-size: 11px;
-  color: var(--text-secondary);
 }
 
 .empty-state {

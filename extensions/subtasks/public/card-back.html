@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Subtarefas & Hierarquia</title>
-  <link rel="stylesheet" href="./css/style.css?v=4">
+  <link rel="stylesheet" href="./css/style.css?v=5">
   <!-- Trello Power-Up Client Library -->
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
@@ -15,11 +15,11 @@
       <div class="parent-banner">
         <div class="parent-info">
           <span class="parent-icon">↳</span>
-          <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#" target="_blank">Card Mestre</a></span>
+          <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#">Card Mestre</a></span>
         </div>
         <div class="parent-actions">
-          <button id="change-parent-btn" class="action-btn-sm" type="button" title="Alterar card pai">Alterar Pai</button>
-          <button id="unlink-parent-btn" class="action-btn-sm danger" type="button" title="Desvincular deste card mestre">Desvincular</button>
+          <button id="change-parent-btn" class="action-btn-sm" type="button" title="Alterar cartão pai">Alterar</button>
+          <button id="unlink-parent-btn" class="action-btn-sm danger" type="button" title="Desvincular deste cartão pai">Desvincular</button>
         </div>
       </div>
     </div>
@@ -29,6 +29,16 @@
       <button id="add-parent-btn" class="add-parent-btn" type="button">
         <span>↳</span> Definir Tarefa Pai (Add Parent)
       </button>
+    </div>
+
+    <!-- Painel Inline para Selecionar Card Pai -->
+    <div id="parent-select-panel" class="inline-card-panel" style="display: none;">
+      <div class="inline-panel-header">
+        <span>Escolha o cartão pai neste quadro:</span>
+        <button id="close-parent-panel-btn" class="close-panel-btn" type="button">✕</button>
+      </div>
+      <input type="text" id="search-parent-input" class="search-input" placeholder="Pesquisar cartão..." autocomplete="off" />
+      <div id="parent-cards-list" class="cards-picker-list"></div>
     </div>
 
     <!-- Seção de Subtarefas do Card Atual -->
@@ -54,29 +64,26 @@
 
       <!-- Lista de Cards Subtarefas Vinculados -->
       <ul id="subtasks-list" class="subtasks-list"></ul>
-      <div id="empty-state" class="empty-state" style="display: none;">Nenhuma subtarefa atrelada a este cartão.</div>
+      <div id="empty-state" class="empty-state" style="display: none;">Nenhum cartão subtarefa vinculado ainda.</div>
 
-      <!-- Formulário Direto e Limpo para Adicionar Subtarefa -->
-      <form id="add-subtask-form" class="add-form-row">
-        <input
-          type="text"
-          id="subtask-input"
-          class="subtask-input"
-          placeholder="Adicionar uma subtarefa..."
-          autocomplete="off"
-          required
-        />
-        <button type="submit" id="add-subtask-btn" class="primary-btn">+ Adicionar</button>
-      </form>
+      <!-- Painel Inline para Selecionar e Vincular Subtarefa -->
+      <div id="subtask-select-panel" class="inline-card-panel" style="display: none;">
+        <div class="inline-panel-header">
+          <span>Escolha um cartão do quadro para vincular como subtarefa:</span>
+          <button id="close-subtask-panel-btn" class="close-panel-btn" type="button">✕</button>
+        </div>
+        <input type="text" id="search-subtask-input" class="search-input" placeholder="Pesquisar cartão..." autocomplete="off" />
+        <div id="subtask-cards-list" class="cards-picker-list"></div>
+      </div>
 
-      <!-- Ações Extras: Vincular Card Existente e Alternar Tema -->
+      <!-- Ações do Rodapé -->
       <div class="bottom-actions">
-        <button id="link-existing-card-btn" class="secondary-btn" type="button">
+        <button id="open-subtask-panel-btn" class="secondary-btn" type="button">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
           </svg>
-          Vincular Cartão do Quadro (Add Subtask)
+          + Vincular Cartão do Quadro como Subtarefa
         </button>
 
         <button id="toggle-theme-btn" class="toggle-theme-btn" type="button" title="Alternar tema claro/escuro">
@@ -86,6 +93,6 @@
     </div>
   </div>
 
-  <script src="./js/card-back.js?v=4"></script>
+  <script src="./js/card-back.js?v=5"></script>
 </body>
 </html>
