@@ -1,12 +1,6 @@
 /* global TrelloPowerUp */
 
-// Inicializa o iframe com a chave do Power-Up para habilitar a API REST nativa do Trello
-const APP_KEY = '91950e3ce18e24fa2eb412a8706d3113';
-
-const t = window.TrelloPowerUp.iframe({
-  appKey: APP_KEY,
-  appName: 'Subtasks & Hierarchy',
-});
+const t = window.TrelloPowerUp.iframe();
 
 let currentCard = null;
 let currentSubtasks = [];
@@ -30,10 +24,8 @@ const progressStats = document.getElementById('progress-stats');
 const subtasksList = document.getElementById('subtasks-list');
 const emptyState = document.getElementById('empty-state');
 
-const createCardForm = document.getElementById('create-card-form');
-const subtaskCardTitle = document.getElementById('subtask-card-title');
-const targetListSelect = document.getElementById('target-list-select');
-const createBtn = document.getElementById('create-btn');
+const addSubtaskForm = document.getElementById('add-subtask-form');
+const subtaskInput = document.getElementById('subtask-input');
 
 const linkExistingCardBtn = document.getElementById('link-existing-card-btn');
 const toggleThemeBtn = document.getElementById('toggle-theme-btn');
@@ -60,7 +52,7 @@ function toggleTheme() {
 
 initTheme();
 
-// Redimensionamento inteligente do iframe
+// Redimensionamento
 function resize() {
   setTimeout(() => {
     t.sizeTo('#container').catch(() => {});
@@ -80,20 +72,6 @@ function isDoneListName(name) {
     n.includes('feito') ||
     n.includes('entregue')
   );
-}
-
-// Popula listas de destino
-function populateListsSelect(lists, currentCardListId) {
-  targetListSelect.innerHTML = '';
-  lists.forEach((list) => {
-    const option = document.createElement('option');
-    option.value = list.id;
-    option.textContent = list.name;
-    if (list.id === currentCardListId) {
-      option.selected = true;
-    }
-    targetListSelect.appendChild(option);
-  });
 }
 
 // Atualiza o medidor de progresso
@@ -174,14 +152,14 @@ function renderSubtasks() {
     const titleLink = document.createElement('a');
     titleLink.className = `subtask-title-link ${isCompleted ? 'completed' : ''}`;
     titleLink.textContent = subtask.title;
-    titleLink.title = 'Clique para abrir o cartão no Trello';
+    titleLink.title = subtask.cardId ? 'Clique para abrir este cartão no Trello' : '';
 
-    titleLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (subtask.cardId) {
+    if (subtask.cardId) {
+      titleLink.addEventListener('click', (e) => {
+        e.preventDefault();
         t.showCard(subtask.cardId);
-      }
-    });
+      });
+    }
 
     leftDiv.appendChild(checkbox);
     leftDiv.appendChild(titleLink);
@@ -199,7 +177,7 @@ function renderSubtasks() {
     const unlinkBtn = document.createElement('button');
     unlinkBtn.className = 'subtask-btn';
     unlinkBtn.innerHTML = '✕';
-    unlinkBtn.title = 'Desvincular este cartão';
+    unlinkBtn.title = 'Remover subtarefa';
     unlinkBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       removeSubtask(subtask.id, subtask.cardId);
@@ -302,93 +280,23 @@ async function unlinkFromParent() {
   renderParentSection();
 }
 
-// Obtém token de autenticação de forma transparente usando a API nativa do Trello
-async function getAuthToken() {
-  try {
-    // 1. Verifica se já está autorizado nativamente
-    const restApi = t.getRestApi();
-    const isAuth = await restApi.isAuthorized();
-    if (isAuth) {
-      return await restApi.getToken();
-    }
+// Adiciona nova subtarefa diretamente
+async function addSubtask(title) {
+  const trimmed = title.trim();
+  if (!trimmed) return;
 
-    // 2. Se não estiver, abre a janela nativa de autorização do próprio Trello
-    await restApi.authorize({ scope: 'read,write', expiration: 'never' });
-    return await restApi.getToken();
-  } catch (e) {
-    console.warn('Autorização nativa não retornou token:', e);
-    return null;
-  }
-}
+  const newSubtask = {
+    id: `st_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    title: trimmed,
+    completed: false,
+    cardId: null,
+    createdAt: new Date().toISOString(),
+  };
 
-// Cria novo card no Trello
-async function createCardOnTrello(title, targetListId) {
-  createBtn.disabled = true;
-  createBtn.textContent = 'Criando...';
-
-  try {
-    const token = await getAuthToken();
-
-    if (token) {
-      // Criação via API do Trello
-      const url = `https://api.trello.com/1/cards?idList=${targetListId}&name=${encodeURIComponent(
-        title
-      )}&key=${APP_KEY}&token=${token}`;
-
-      const res = await fetch(url, { method: 'POST' });
-      if (res.ok) {
-        const newCard = await res.json();
-        const subtaskId = `st_card_${newCard.id}`;
-
-        currentSubtasks.push({
-          id: subtaskId,
-          cardId: newCard.id,
-          title: newCard.name,
-          url: newCard.url,
-          completed: false,
-          createdAt: new Date().toISOString(),
-        });
-
-        boardCardsMap.set(newCard.id, newCard);
-        await saveSubtasks();
-
-        try {
-          await t.set(newCard.id, 'shared', 'subtask_parent', {
-            parentId: currentCard.id,
-            parentTitle: currentCard.name,
-            parentUrl: currentCard.url,
-            subtaskId: subtaskId,
-          });
-        } catch (err) {
-          console.warn('Aviso ao setar parent:', err);
-        }
-
-        subtaskCardTitle.value = '';
-        renderSubtasks();
-        return;
-      }
-    }
-
-    // Fallback: Adiciona a subtarefa diretamente se a autorização foi cancelada ou falhou
-    const localId = `st_${Date.now()}`;
-    currentSubtasks.push({
-      id: localId,
-      cardId: null,
-      title: title,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    });
-
-    await saveSubtasks();
-    subtaskCardTitle.value = '';
-    renderSubtasks();
-  } catch (error) {
-    console.error('Erro ao criar cartão:', error);
-  } finally {
-    createBtn.disabled = false;
-    createBtn.textContent = '+ Criar Cartão';
-    resize();
-  }
+  currentSubtasks.push(newSubtask);
+  await saveSubtasks();
+  subtaskInput.value = '';
+  renderSubtasks();
 }
 
 // Inicialização
@@ -415,7 +323,6 @@ async function init() {
     currentSubtasks = (subtasksData && Array.isArray(subtasksData.subtasks)) ? subtasksData.subtasks : [];
     parentInfo = parentData || null;
 
-    populateListsSelect(boardLists, currentCard.idList);
     renderParentSection();
     renderSubtasks();
   } catch (error) {
@@ -424,13 +331,10 @@ async function init() {
 }
 
 // Event Listeners
-createCardForm.addEventListener('submit', async (e) => {
+addSubtaskForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const title = subtaskCardTitle.value.trim();
-  const targetListId = targetListSelect.value;
-  if (!title || !targetListId) return;
-
-  await createCardOnTrello(title, targetListId);
+  await addSubtask(subtaskInput.value);
+  subtaskInput.focus();
 });
 
 unlinkParentBtn.addEventListener('click', async () => {
@@ -442,7 +346,7 @@ unlinkParentBtn.addEventListener('click', async () => {
 changeParentBtn.addEventListener('click', () => {
   t.popup({
     title: 'Alterar Cartão Pai (Parent)',
-    url: './link-modal.html?mode=parent',
+    url: './link-modal.html?mode=parent&v=4',
     height: 360,
   });
 });
@@ -450,15 +354,15 @@ changeParentBtn.addEventListener('click', () => {
 addParentBtn.addEventListener('click', () => {
   t.popup({
     title: 'Definir Cartão Pai (Add Parent)',
-    url: './link-modal.html?mode=parent',
+    url: './link-modal.html?mode=parent&v=4',
     height: 360,
   });
 });
 
 linkExistingCardBtn.addEventListener('click', () => {
   t.popup({
-    title: 'Vincular Subtarefa (Add Subtask)',
-    url: './link-modal.html?mode=subtask',
+    title: 'Vincular Cartão do Quadro (Add Subtask)',
+    url: './link-modal.html?mode=subtask&v=4',
     height: 360,
   });
 });

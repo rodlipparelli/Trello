@@ -155,8 +155,8 @@ window.TrelloPowerUp.initialize({
       icon: ICON,
       content: {
         type: 'iframe',
-        url: t.signUrl('./card-back.html'),
-        height: 380,
+        url: t.signUrl('./card-back.html?v=4'),
+        height: 340,
       },
     };
   },
@@ -170,7 +170,7 @@ window.TrelloPowerUp.initialize({
         callback: function (tContext) {
           return tContext.popup({
             title: 'Vincular Subtarefa (Add Subtask)',
-            url: './link-modal.html?mode=subtask',
+            url: './link-modal.html?mode=subtask&v=4',
             height: 360,
           });
         },
@@ -181,7 +181,7 @@ window.TrelloPowerUp.initialize({
         callback: function (tContext) {
           return tContext.popup({
             title: 'Definir Tarefa Pai (Add Parent)',
-            url: './link-modal.html?mode=parent',
+            url: './link-modal.html?mode=parent&v=4',
             height: 360,
           });
         },

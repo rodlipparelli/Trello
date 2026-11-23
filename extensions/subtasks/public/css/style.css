@@ -67,7 +67,7 @@ body.light-theme {
 }
 
 html, body {
-  overflow-y: hidden; /* Remove barra de rolagem lateral */
+  overflow-y: hidden;
 }
 
 body {
@@ -221,7 +221,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .progress-bar-track {
@@ -349,23 +349,15 @@ body {
   color: var(--danger-color);
 }
 
-/* Área de Criação de Cartão Subtarefa */
-.create-card-section {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 10px 12px;
+/* Linha Limpa para Adicionar Subtarefa */
+.add-form-row {
+  display: flex;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
-.create-form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .subtask-input {
-  width: 100%;
+  flex-grow: 1;
   height: 36px;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
@@ -385,42 +377,12 @@ body {
   color: var(--text-muted);
 }
 
-.select-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.destination-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.target-list-select {
-  flex-grow: 1;
-  height: 32px;
-  padding: 4px 8px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 12px;
-  background-color: var(--bg-input);
-  color: var(--text-primary);
-  outline: none;
-  cursor: pointer;
-}
-
-.target-list-select:focus {
-  border-color: var(--accent-color);
-}
-
 .primary-btn {
   background-color: var(--accent-color);
   color: var(--accent-text);
   border: none;
   border-radius: var(--border-radius);
-  padding: 7px 14px;
+  padding: 8px 14px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

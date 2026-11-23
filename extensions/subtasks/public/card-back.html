@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Subtarefas & Hierarquia</title>
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css?v=4">
   <!-- Trello Power-Up Client Library -->
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
@@ -18,7 +18,7 @@
           <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#" target="_blank">Card Mestre</a></span>
         </div>
         <div class="parent-actions">
-          <button id="change-parent-btn" class="action-btn-sm" type="button" title="Alterar card pai">Alterar</button>
+          <button id="change-parent-btn" class="action-btn-sm" type="button" title="Alterar card pai">Alterar Pai</button>
           <button id="unlink-parent-btn" class="action-btn-sm danger" type="button" title="Desvincular deste card mestre">Desvincular</button>
         </div>
       </div>
@@ -54,27 +54,20 @@
 
       <!-- Lista de Cards Subtarefas Vinculados -->
       <ul id="subtasks-list" class="subtasks-list"></ul>
-      <div id="empty-state" class="empty-state" style="display: none;">Nenhum card subtarefa atrelado ainda.</div>
+      <div id="empty-state" class="empty-state" style="display: none;">Nenhuma subtarefa atrelada a este cartão.</div>
 
-      <!-- Formulário de Criação de Novo Card como Subtarefa com Destino de Lista -->
-      <div class="create-card-section">
-        <form id="create-card-form" class="create-form-fields">
-          <input
-            type="text"
-            id="subtask-card-title"
-            class="subtask-input"
-            placeholder="Criar novo cartão subtarefa..."
-            autocomplete="off"
-            required
-          />
-
-          <div class="select-row">
-            <label for="target-list-select" class="destination-label">Criar na lista:</label>
-            <select id="target-list-select" class="target-list-select"></select>
-            <button type="submit" id="create-btn" class="primary-btn">+ Criar Cartão</button>
-          </div>
-        </form>
-      </div>
+      <!-- Formulário Direto e Limpo para Adicionar Subtarefa -->
+      <form id="add-subtask-form" class="add-form-row">
+        <input
+          type="text"
+          id="subtask-input"
+          class="subtask-input"
+          placeholder="Adicionar uma subtarefa..."
+          autocomplete="off"
+          required
+        />
+        <button type="submit" id="add-subtask-btn" class="primary-btn">+ Adicionar</button>
+      </form>
 
       <!-- Ações Extras: Vincular Card Existente e Alternar Tema -->
       <div class="bottom-actions">
@@ -83,7 +76,7 @@
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
           </svg>
-          Vincular Card Existente (Add Subtask)
+          Vincular Cartão do Quadro (Add Subtask)
         </button>
 
         <button id="toggle-theme-btn" class="toggle-theme-btn" type="button" title="Alternar tema claro/escuro">
@@ -93,6 +86,6 @@
     </div>
   </div>
 
-  <script src="./js/card-back.js"></script>
+  <script src="./js/card-back.js?v=4"></script>
 </body>
 </html>
