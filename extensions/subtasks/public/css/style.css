@@ -8,8 +8,59 @@
   --text-subtle: #5e6c84;
   --bg-subtle: #f4f5f7;
   --border-color: #dfe1e6;
+  --card-bg: #fafbfc;
+  --hover-bg: #091e420a;
+  --input-bg: #ffffff;
+  --parent-banner-bg: #e4f0f6;
+  --parent-banner-border: #bcd9ea;
+  --parent-banner-text: #0079bf;
+  --progress-track-bg: #091e4214;
   --border-radius: 4px;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Ubuntu, "Helvetica Neue", sans-serif;
+}
+
+/* Suporte Nativo a Dark Mode / Tema Escuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #579dff;
+    --primary-hover: #85b8ff;
+    --success-color: #4bce97;
+    --warning-color: #e2b203;
+    --danger-color: #f87168;
+    --text-main: #b6c2cf;
+    --text-subtle: #8c9bab;
+    --bg-subtle: #1d2125;
+    --border-color: #38414a;
+    --card-bg: #22272b;
+    --hover-bg: #2c333a;
+    --input-bg: #22272b;
+    --parent-banner-bg: #1c2b41;
+    --parent-banner-border: #244a75;
+    --parent-banner-text: #579dff;
+    --progress-track-bg: #2c333a;
+  }
+}
+
+/* Suporte quando o Trello injeta classes de tema escuro */
+body.theme-dark,
+body[data-theme="dark"],
+.mod-dark-theme {
+  --primary-color: #579dff;
+  --primary-hover: #85b8ff;
+  --success-color: #4bce97;
+  --warning-color: #e2b203;
+  --danger-color: #f87168;
+  --text-main: #b6c2cf;
+  --text-subtle: #8c9bab;
+  --bg-subtle: #1d2125;
+  --border-color: #38414a;
+  --card-bg: #22272b;
+  --hover-bg: #2c333a;
+  --input-bg: #22272b;
+  --parent-banner-bg: #1c2b41;
+  --parent-banner-border: #244a75;
+  --parent-banner-text: #579dff;
+  --progress-track-bg: #2c333a;
 }
 
 * {
@@ -31,13 +82,16 @@ body {
   width: 100%;
 }
 
-/* Parent Card Banner (para cards que são subtarefas) */
+/* Seção do Card Pai (Parent Card) */
+.parent-container {
+  margin-bottom: 14px;
+}
+
 .parent-banner {
-  background-color: #e4f0f6;
-  border: 1px solid #bcd9ea;
+  background-color: var(--parent-banner-bg);
+  border: 1px solid var(--parent-banner-border);
   border-radius: var(--border-radius);
   padding: 10px 14px;
-  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -47,36 +101,80 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
+  min-width: 0;
 }
 
 .parent-icon {
-  font-size: 16px;
-  color: var(--primary-color);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--parent-banner-text);
+  line-height: 1;
 }
 
 .parent-link {
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--parent-banner-text);
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .parent-link:hover {
   text-decoration: underline;
 }
 
-.unlink-parent-btn {
+.parent-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unlink-parent-btn, .change-parent-btn {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-subtle);
   cursor: pointer;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: var(--border-radius);
+  transition: all 0.15s ease;
 }
 
 .unlink-parent-btn:hover {
-  background-color: rgba(9, 30, 66, 0.08);
+  background-color: rgba(235, 90, 70, 0.15);
   color: var(--danger-color);
+}
+
+.change-parent-btn:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-main);
+}
+
+.add-parent-row {
+  margin-bottom: 14px;
+}
+
+.add-parent-btn {
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  color: var(--text-subtle);
+  padding: 6px 12px;
+  border-radius: var(--border-radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.add-parent-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: var(--hover-bg);
 }
 
 /* Seção de Subtarefas */
@@ -96,7 +194,7 @@ body {
 .subtasks-icon {
   width: 18px;
   height: 18px;
-  color: var(--text-main);
+  color: var(--primary-color);
 }
 
 .subtasks-title {
@@ -112,7 +210,7 @@ body {
 }
 
 .progress-stats.completed {
-  color: #519839;
+  color: var(--success-color);
   font-weight: 600;
 }
 
@@ -127,7 +225,7 @@ body {
 .progress-bar-track {
   flex-grow: 1;
   height: 8px;
-  background-color: #091e4214;
+  background-color: var(--progress-track-bg);
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -154,7 +252,7 @@ body {
 }
 
 .progress-percentage.complete {
-  color: #519839;
+  color: var(--success-color);
 }
 
 /* Lista de Subtarefas */
@@ -162,22 +260,23 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
 .subtask-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border-radius: var(--border-radius);
-  background-color: transparent;
-  transition: background-color 0.15s ease;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .subtask-item:hover {
-  background-color: #091e420a;
+  background-color: var(--hover-bg);
 }
 
 .subtask-left {
@@ -195,25 +294,34 @@ body {
   accent-color: var(--primary-color);
 }
 
-.subtask-title {
+.subtask-title-link {
   color: var(--text-main);
-  word-break: break-word;
+  font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
   font-size: 14px;
-  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.subtask-title.completed {
+.subtask-title-link:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.subtask-title-link.completed {
   text-decoration: line-through;
   color: var(--text-subtle);
 }
 
-.card-link-badge {
+.card-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: #e4f0f6;
-  color: var(--primary-color);
+  background-color: var(--parent-banner-bg);
+  color: var(--parent-banner-text);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
@@ -222,20 +330,19 @@ body {
   white-space: nowrap;
 }
 
-.card-link-badge:hover {
-  background-color: #cce4f2;
+.list-name-badge {
+  font-size: 11px;
+  color: var(--text-subtle);
+  background-color: var(--progress-track-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 .subtask-actions {
   display: flex;
   align-items: center;
   gap: 4px;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.subtask-item:hover .subtask-actions {
-  opacity: 1;
 }
 
 .subtask-btn {
@@ -249,35 +356,83 @@ body {
 }
 
 .subtask-btn:hover {
-  background-color: #091e4214;
+  background-color: rgba(235, 90, 70, 0.15);
   color: var(--danger-color);
 }
 
-/* Área de Criação e Ações */
-.actions-container {
+/* Área de Criação de Card e Seleção de Destino */
+.create-card-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.create-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.create-form-fields {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.add-subtask-form {
+.input-row {
   display: flex;
   gap: 8px;
-  align-items: center;
 }
 
 .subtask-input {
   flex-grow: 1;
   height: 36px;
   padding: 8px 12px;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 14px;
   outline: none;
+  background-color: var(--input-bg);
+  color: var(--text-main);
   transition: border-color 0.2s ease;
 }
 
 .subtask-input:focus {
+  border-color: var(--primary-color);
+}
+
+.select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.destination-label {
+  font-size: 12px;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.target-list-select {
+  flex-grow: 1;
+  height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 13px;
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+}
+
+.target-list-select:focus {
   border-color: var(--primary-color);
 }
 
@@ -287,8 +442,8 @@ body {
   border: none;
   border-radius: var(--border-radius);
   padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
   white-space: nowrap;
@@ -299,9 +454,9 @@ body {
 }
 
 .secondary-btn {
-  background-color: #091e420a;
+  background-color: var(--hover-bg);
   color: var(--text-main);
-  border: none;
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 8px 12px;
   font-size: 13px;
@@ -310,18 +465,20 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .secondary-btn:hover {
-  background-color: #091e4214;
+  background-color: var(--progress-track-bg);
+  border-color: var(--primary-color);
 }
 
-.buttons-row {
+.bottom-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* Empty state */
@@ -332,19 +489,23 @@ body {
   padding: 8px 0;
 }
 
-/* Modal de Vinculação */
+/* Modal e Popups */
 .modal-body {
   padding: 12px;
+  background-color: var(--card-bg);
+  color: var(--text-main);
 }
 
 .search-box {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 14px;
   margin-bottom: 12px;
   outline: none;
+  background-color: var(--input-bg);
+  color: var(--text-main);
 }
 
 .search-box:focus {
@@ -352,7 +513,7 @@ body {
 }
 
 .cards-select-list {
-  max-height: 250px;
+  max-height: 280px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -364,7 +525,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background-color: #fafbfc;
+  background-color: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -372,8 +533,8 @@ body {
 }
 
 .card-select-item:hover {
-  background-color: #ebecf0;
-  border-color: #c1c7d0;
+  background-color: var(--hover-bg);
+  border-color: var(--primary-color);
 }
 
 .card-select-title {
@@ -381,7 +542,45 @@ body {
   color: var(--text-main);
 }
 
+.card-select-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .card-select-list-name {
   font-size: 11px;
   color: var(--text-subtle);
+}
+
+/* Painel de Configuração de Chave API para criação de cards */
+.api-config-panel {
+  background-color: var(--bg-subtle);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+
+.api-config-panel.hidden {
+  display: none;
+}
+
+.api-config-panel a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.api-token-input {
+  width: 100%;
+  padding: 6px 8px;
+  margin: 6px 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  font-size: 12px;
+  outline: none;
 }

@@ -3,20 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Subtarefas</title>
+  <title>Subtarefas & Hierarquia</title>
   <link rel="stylesheet" href="./css/style.css">
   <!-- Trello Power-Up Client Library -->
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
 <body>
   <div id="container">
-    <!-- Banner exibido caso este card seja uma subtarefa de outro card -->
-    <div id="parent-card-banner" class="parent-banner" style="display: none;">
-      <div class="parent-info">
-        <span class="parent-icon">↳</span>
-        <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#" target="_blank">Card Mestre</a></span>
+    <!-- Seção do Card Pai (Exibida quando este card tem um pai) -->
+    <div id="parent-container" class="parent-container" style="display: none;">
+      <div class="parent-banner">
+        <div class="parent-info">
+          <span class="parent-icon">↳</span>
+          <span>Subtarefa de: <a id="parent-card-link" class="parent-link" href="#" target="_blank">Card Mestre</a></span>
+        </div>
+        <div class="parent-actions">
+          <button id="change-parent-btn" class="change-parent-btn" type="button" title="Alterar card pai">Alterar</button>
+          <button id="unlink-parent-btn" class="unlink-parent-btn" type="button" title="Desvincular deste card mestre">Desvincular</button>
+        </div>
       </div>
-      <button id="unlink-parent-btn" class="unlink-parent-btn" title="Desvincular deste card mestre">Desvincular</button>
+    </div>
+
+    <!-- Botão para definir card pai quando o card não tiver um -->
+    <div id="add-parent-row" class="add-parent-row">
+      <button id="add-parent-btn" class="add-parent-btn" type="button">
+        <span>↳</span> Definir Tarefa Pai (Add Parent)
+      </button>
     </div>
 
     <!-- Seção de Subtarefas do Card Atual -->
@@ -40,32 +52,59 @@
         <span id="progress-percentage" class="progress-percentage">0%</span>
       </div>
 
-      <!-- Lista de Subtarefas -->
+      <!-- Lista de Cards Subtarefas Vinculados -->
       <ul id="subtasks-list" class="subtasks-list"></ul>
-      <div id="empty-state" class="empty-state" style="display: none;">Nenhuma subtarefa vinculada a este card.</div>
+      <div id="empty-state" class="empty-state" style="display: none;">Nenhum card subtarefa atrelado a este card ainda.</div>
 
-      <!-- Ações de Adição e Vinculação -->
-      <div class="actions-container">
-        <form id="add-subtask-form" class="add-subtask-form">
-          <input
-            type="text"
-            id="subtask-input"
-            class="subtask-input"
-            placeholder="Adicionar uma nova subtarefa..."
-            autocomplete="off"
-          />
-          <button type="submit" class="primary-btn">Adicionar</button>
+      <!-- Formulário de Criação de Novo Card como Subtarefa com Destino de Lista -->
+      <div class="create-card-section">
+        <div class="create-card-title">
+          <span>+ Criar novo card como subtarefa</span>
+        </div>
+        <form id="create-card-form" class="create-form-fields">
+          <div class="input-row">
+            <input
+              type="text"
+              id="subtask-card-title"
+              class="subtask-input"
+              placeholder="Título do novo cartão subtarefa..."
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="select-row">
+            <label for="target-list-select" class="destination-label">Criar na lista:</label>
+            <select id="target-list-select" class="target-list-select"></select>
+            <button type="submit" id="create-btn" class="primary-btn">Criar Cartão</button>
+          </div>
         </form>
 
-        <div class="buttons-row">
-          <button id="link-existing-card-btn" class="secondary-btn" type="button">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-            Vincular Card Existente
-          </button>
+        <!-- Painel de autorização do Trello para criar cards reais via API -->
+        <div id="api-config-panel" class="api-config-panel hidden">
+          <div>
+            <strong>🔑 Autorização para Criar Cartões no Trello:</strong>
+            <p style="margin-top: 4px;">
+              Para que a extensão crie cartões automaticamente no seu quadro, cole seu <strong>Token do Trello</strong>:
+            </p>
+            <input type="password" id="api-token-input" class="api-token-input" placeholder="Cole seu Trello Token aqui..." />
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <a href="https://trello.com/1/authorize?expiration=never&name=Subtasks%20Power-Up&scope=read,write&response_type=token&key=91950e3ce18e24fa2eb412a8706d3113" id="get-token-link" target="_blank">Clique aqui para gerar o Token (1 clique)</a>
+              <button type="button" id="save-token-btn" class="primary-btn" style="padding: 4px 10px; font-size: 11px;">Salvar Token</button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Ações Extras: Vincular Card Existente -->
+      <div class="bottom-actions">
+        <button id="link-existing-card-btn" class="secondary-btn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          Vincular Card Existente (Add Subtask)
+        </button>
       </div>
     </div>
   </div>
