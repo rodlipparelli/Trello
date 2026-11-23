@@ -156,7 +156,7 @@ window.TrelloPowerUp.initialize({
       content: {
         type: 'iframe',
         url: t.signUrl('./card-back.html'),
-        height: 320,
+        height: 380,
       },
     };
   },

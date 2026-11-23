@@ -2,7 +2,6 @@
 
 const t = window.TrelloPowerUp.iframe();
 
-// App Key padrão do Trello para Power-Ups ou customizada
 const DEFAULT_APP_KEY = '91950e3ce18e24fa2eb412a8706d3113';
 
 let currentCard = null;
@@ -33,26 +32,40 @@ const subtaskCardTitle = document.getElementById('subtask-card-title');
 const targetListSelect = document.getElementById('target-list-select');
 const createBtn = document.getElementById('create-btn');
 
+const toggleTokenPanelBtn = document.getElementById('toggle-token-panel-btn');
 const apiConfigPanel = document.getElementById('api-config-panel');
 const apiTokenInput = document.getElementById('api-token-input');
 const saveTokenBtn = document.getElementById('save-token-btn');
-const getTokenLink = document.getElementById('get-token-link');
 
 const linkExistingCardBtn = document.getElementById('link-existing-card-btn');
+const toggleThemeBtn = document.getElementById('toggle-theme-btn');
+const themeIcon = document.getElementById('theme-icon');
 
-// Detecção e aplicação de tema escuro/claro
-function applyTheme() {
-  const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  document.body.classList.toggle('theme-dark', isDark);
+// Gestão de Tema: Padrão Escuro (para combinar perfeitamente com Trello Dark), com alternância fácil
+function initTheme() {
+  const savedTheme = localStorage.getItem('trello_subtasks_theme');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    themeIcon.textContent = '🌙';
+  } else {
+    document.body.classList.remove('light-theme');
+    themeIcon.textContent = '☀️';
+  }
 }
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
-}
-applyTheme();
 
-// Redimensionamento do iframe
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-theme');
+  localStorage.setItem('trello_subtasks_theme', isLight ? 'light' : 'dark');
+  themeIcon.textContent = isLight ? '🌙' : '☀️';
+}
+
+initTheme();
+
+// Redimensionamento responsivo do iframe
 function resize() {
-  t.sizeTo('#container').catch(() => {});
+  setTimeout(() => {
+    t.sizeTo('#container').catch(() => {});
+  }, 50);
 }
 
 // Verifica se uma lista tem nome indicando conclusão
@@ -77,7 +90,6 @@ function populateListsSelect(lists, currentCardListId) {
     const option = document.createElement('option');
     option.value = list.id;
     option.textContent = list.name;
-    // Seleciona a lista do card atual por padrão
     if (list.id === currentCardListId) {
       option.selected = true;
     }
@@ -99,7 +111,6 @@ function updateProgressBar() {
   progressBarContainer.style.display = 'flex';
   progressStats.style.display = 'inline-block';
 
-  // Verifica cards concluídos (via checkbox manual, dueComplete ou lista de concluído)
   const completed = currentSubtasks.filter((st) => {
     if (st.completed) return true;
     if (st.cardId && boardCardsMap.has(st.cardId)) {
@@ -139,7 +150,6 @@ function renderSubtasks() {
     const leftDiv = document.createElement('div');
     leftDiv.className = 'subtask-left';
 
-    // Determina se a subtask está concluída
     let isCompleted = !!subtask.completed;
     let currentListName = '';
 
@@ -165,7 +175,7 @@ function renderSubtasks() {
     const titleLink = document.createElement('a');
     titleLink.className = `subtask-title-link ${isCompleted ? 'completed' : ''}`;
     titleLink.textContent = subtask.title;
-    titleLink.title = 'Clique para abrir o cartão no Trello';
+    titleLink.title = 'Clique para abrir este cartão';
 
     titleLink.addEventListener('click', (e) => {
       e.preventDefault();
@@ -177,12 +187,10 @@ function renderSubtasks() {
     leftDiv.appendChild(checkbox);
     leftDiv.appendChild(titleLink);
 
-    // Badge com nome da lista atual do card filho
     if (currentListName) {
       const listBadge = document.createElement('span');
       listBadge.className = 'list-name-badge';
       listBadge.textContent = currentListName;
-      listBadge.title = `Lista: ${currentListName}`;
       leftDiv.appendChild(listBadge);
     }
 
@@ -248,7 +256,7 @@ async function toggleSubtask(id) {
         completed: subtask.completed,
       });
     } catch (e) {
-      console.warn('Aviso: sincronização secundária:', e);
+      console.warn('Aviso sincronização:', e);
     }
   }
 
@@ -264,7 +272,7 @@ async function removeSubtask(id, cardId) {
     try {
       await t.set(cardId, 'shared', 'subtask_parent', null);
     } catch (e) {
-      console.warn('Aviso ao desvincular card filho:', e);
+      console.warn('Aviso desvincular filho:', e);
     }
   }
 
@@ -301,14 +309,12 @@ async function createCardOnTrello(title, targetListId) {
   createBtn.textContent = 'Criando...';
 
   try {
-    // 1. Verifica token do Trello
     if (!userToken) {
       userToken = await t.get('member', 'private', 'trello_token');
     }
 
     if (!userToken) {
-      // Exibe painel para configurar token
-      apiConfigPanel.classList.remove('hidden');
+      apiConfigPanel.style.display = 'block';
       resize();
       createBtn.disabled = false;
       createBtn.textContent = 'Criar Cartão';
@@ -322,12 +328,11 @@ async function createCardOnTrello(title, targetListId) {
 
     const res = await fetch(url, { method: 'POST' });
     if (!res.ok) {
-      throw new Error(`Erro na API do Trello: ${res.statusText}`);
+      throw new Error(`Erro na API: ${res.statusText}`);
     }
 
     const newCard = await res.json();
 
-    // 2. Vincula no Card Mestre
     const subtaskId = `st_card_${newCard.id}`;
     currentSubtasks.push({
       id: subtaskId,
@@ -341,7 +346,6 @@ async function createCardOnTrello(title, targetListId) {
     boardCardsMap.set(newCard.id, newCard);
     await saveSubtasks();
 
-    // 3. Define relação de mão-dupla no novo card criado
     try {
       await t.set(newCard.id, 'shared', 'subtask_parent', {
         parentId: currentCard.id,
@@ -350,16 +354,16 @@ async function createCardOnTrello(title, targetListId) {
         subtaskId: subtaskId,
       });
     } catch (err) {
-      console.warn('Aviso: Falha ao setar parent no novo card via client:', err);
+      console.warn('Aviso: setar parent no filho:', err);
     }
 
     subtaskCardTitle.value = '';
-    apiConfigPanel.classList.add('hidden');
+    apiConfigPanel.style.display = 'none';
     renderSubtasks();
   } catch (error) {
-    console.error('Erro ao criar cartão no Trello:', error);
-    alert('Não foi possível criar o cartão automaticamente. Verifique seu token do Trello.');
-    apiConfigPanel.classList.remove('hidden');
+    console.error('Erro ao criar cartão:', error);
+    alert('Erro ao criar cartão. Por favor, verifique se seu token é válido.');
+    apiConfigPanel.style.display = 'block';
     resize();
   } finally {
     createBtn.disabled = false;
@@ -370,7 +374,7 @@ async function createCardOnTrello(title, targetListId) {
 // Inicialização
 async function init() {
   try {
-    applyTheme();
+    initTheme();
 
     const [card, lists, cards, subtasksData, parentData, storedToken] = await Promise.all([
       t.card('id', 'name', 'url', 'idList'),
@@ -397,7 +401,7 @@ async function init() {
     renderParentSection();
     renderSubtasks();
   } catch (error) {
-    console.error('Erro ao carregar dados do Power-Up:', error);
+    console.error('Erro ao carregar Power-Up:', error);
   }
 }
 
@@ -411,14 +415,20 @@ createCardForm.addEventListener('submit', async (e) => {
   await createCardOnTrello(title, targetListId);
 });
 
+toggleTokenPanelBtn.addEventListener('click', () => {
+  const isHidden = apiConfigPanel.style.display === 'none';
+  apiConfigPanel.style.display = isHidden ? 'block' : 'none';
+  resize();
+});
+
 saveTokenBtn.addEventListener('click', async () => {
   const token = apiTokenInput.value.trim();
   if (token) {
     userToken = token;
     localStorage.setItem('trello_token', token);
     await t.set('member', 'private', 'trello_token', token);
-    alert('Token salvo com sucesso! Agora você pode criar novos cartões.');
-    apiConfigPanel.classList.add('hidden');
+    alert('Token configurado com sucesso!');
+    apiConfigPanel.style.display = 'none';
     resize();
   }
 });
@@ -452,6 +462,8 @@ linkExistingCardBtn.addEventListener('click', () => {
     height: 360,
   });
 });
+
+toggleThemeBtn.addEventListener('click', toggleTheme);
 
 window.addEventListener('focus', init);
 

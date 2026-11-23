@@ -1,66 +1,63 @@
 :root {
-  --primary-color: #0079bf;
-  --primary-hover: #026aa7;
-  --success-color: #61bd4f;
-  --warning-color: #f2d600;
-  --danger-color: #eb5a46;
-  --text-main: #172b4d;
-  --text-subtle: #5e6c84;
-  --bg-subtle: #f4f5f7;
-  --border-color: #dfe1e6;
-  --card-bg: #fafbfc;
-  --hover-bg: #091e420a;
-  --input-bg: #ffffff;
-  --parent-banner-bg: #e4f0f6;
-  --parent-banner-border: #bcd9ea;
-  --parent-banner-text: #0079bf;
-  --progress-track-bg: #091e4214;
+  /* Tema Escuro Nativo do Trello (Padrão para garantir legibilidade impecável no Dark Mode) */
+  --bg-page: #22272b;
+  --bg-card: #1d2125;
+  --bg-input: #22272b;
+  --bg-button: #282e33;
+  --bg-button-hover: #333c43;
+  --border-color: #38414a;
+  --border-subtle: #2c333a;
+
+  /* Textos de Alto Contraste */
+  --text-primary: #e6edf5;
+  --text-secondary: #9fadbc;
+  --text-muted: #738496;
+
+  /* Cores de Destaque */
+  --accent-color: #579dff;
+  --accent-hover: #85b8ff;
+  --accent-text: #1d2125;
+  --success-color: #4bce97;
+  --warning-color: #e2b203;
+  --danger-color: #f87168;
+
+  /* Banners e Badges */
+  --parent-banner-bg: #1c2b41;
+  --parent-banner-border: #244a75;
+  --parent-banner-text: #579dff;
+  --tag-bg: #282e33;
+  --tag-text: #8c9bab;
+
   --border-radius: 4px;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Ubuntu, "Helvetica Neue", sans-serif;
 }
 
-/* Suporte Nativo a Dark Mode / Tema Escuro */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary-color: #579dff;
-    --primary-hover: #85b8ff;
-    --success-color: #4bce97;
-    --warning-color: #e2b203;
-    --danger-color: #f87168;
-    --text-main: #b6c2cf;
-    --text-subtle: #8c9bab;
-    --bg-subtle: #1d2125;
-    --border-color: #38414a;
-    --card-bg: #22272b;
-    --hover-bg: #2c333a;
-    --input-bg: #22272b;
-    --parent-banner-bg: #1c2b41;
-    --parent-banner-border: #244a75;
-    --parent-banner-text: #579dff;
-    --progress-track-bg: #2c333a;
-  }
-}
+/* Modo Claro Explícito (quando o usuário escolher ou sistema for claro explicitamente) */
+body.light-theme {
+  --bg-page: #ffffff;
+  --bg-card: #f7f8f9;
+  --bg-input: #ffffff;
+  --bg-button: #091e420f;
+  --bg-button-hover: #091e421f;
+  --border-color: #dfe1e6;
+  --border-subtle: #ebecf0;
 
-/* Suporte quando o Trello injeta classes de tema escuro */
-body.theme-dark,
-body[data-theme="dark"],
-.mod-dark-theme {
-  --primary-color: #579dff;
-  --primary-hover: #85b8ff;
-  --success-color: #4bce97;
-  --warning-color: #e2b203;
-  --danger-color: #f87168;
-  --text-main: #b6c2cf;
-  --text-subtle: #8c9bab;
-  --bg-subtle: #1d2125;
-  --border-color: #38414a;
-  --card-bg: #22272b;
-  --hover-bg: #2c333a;
-  --input-bg: #22272b;
-  --parent-banner-bg: #1c2b41;
-  --parent-banner-border: #244a75;
-  --parent-banner-text: #579dff;
-  --progress-track-bg: #2c333a;
+  --text-primary: #172b4d;
+  --text-secondary: #5e6c84;
+  --text-muted: #8993a4;
+
+  --accent-color: #0065ff;
+  --accent-hover: #0052cc;
+  --accent-text: #ffffff;
+  --success-color: #36b37e;
+  --warning-color: #ffab00;
+  --danger-color: #ff5630;
+
+  --parent-banner-bg: #deebff;
+  --parent-banner-border: #b3d4ff;
+  --parent-banner-text: #0747a6;
+  --tag-bg: #ebecf0;
+  --tag-text: #505f79;
 }
 
 * {
@@ -73,25 +70,26 @@ body {
   font-family: var(--font-family);
   font-size: 14px;
   line-height: 20px;
-  color: var(--text-main);
+  color: var(--text-primary);
   background-color: transparent;
-  padding: 8px 0;
+  padding: 6px 0 16px 0;
+  overflow-x: hidden;
 }
 
 #container {
   width: 100%;
 }
 
-/* Seção do Card Pai (Parent Card) */
+/* Banner do Card Pai */
 .parent-container {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .parent-banner {
   background-color: var(--parent-banner-bg);
   border: 1px solid var(--parent-banner-border);
   border-radius: var(--border-radius);
-  padding: 10px 14px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -101,12 +99,12 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 13px;
   min-width: 0;
 }
 
 .parent-icon {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: var(--parent-banner-text);
   line-height: 1;
@@ -131,35 +129,36 @@ body {
   gap: 6px;
 }
 
-.unlink-parent-btn, .change-parent-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-subtle);
+.action-btn-sm {
+  background: var(--bg-button);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 12px;
-  padding: 4px 8px;
+  font-size: 11px;
+  padding: 3px 8px;
   border-radius: var(--border-radius);
   transition: all 0.15s ease;
 }
 
-.unlink-parent-btn:hover {
-  background-color: rgba(235, 90, 70, 0.15);
+.action-btn-sm:hover {
+  background-color: var(--bg-button-hover);
+  color: var(--text-primary);
+}
+
+.action-btn-sm.danger:hover {
+  border-color: var(--danger-color);
   color: var(--danger-color);
 }
 
-.change-parent-btn:hover {
-  background-color: var(--hover-bg);
-  color: var(--text-main);
-}
-
+/* Botão "Definir Tarefa Pai (Add Parent)" idêntico aos botões nativos do Trello */
 .add-parent-row {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .add-parent-btn {
-  background: transparent;
-  border: 1px dashed var(--border-color);
-  color: var(--text-subtle);
+  background-color: var(--bg-button);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   padding: 6px 12px;
   border-radius: var(--border-radius);
   font-size: 13px;
@@ -168,16 +167,16 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .add-parent-btn:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  background-color: var(--hover-bg);
+  background-color: var(--bg-button-hover);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
-/* Seção de Subtarefas */
+/* Cabeçalho da Seção de Subtarefas */
 .subtasks-header {
   display: flex;
   align-items: center;
@@ -194,19 +193,19 @@ body {
 .subtasks-icon {
   width: 18px;
   height: 18px;
-  color: var(--primary-color);
+  color: var(--accent-color);
 }
 
 .subtasks-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-primary);
 }
 
 .progress-stats {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-subtle);
+  color: var(--text-secondary);
 }
 
 .progress-stats.completed {
@@ -218,14 +217,14 @@ body {
 .progress-bar-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .progress-bar-track {
   flex-grow: 1;
   height: 8px;
-  background-color: var(--progress-track-bg);
+  background-color: var(--border-color);
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -234,9 +233,9 @@ body {
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
   border-radius: 4px;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition: width 0.3s ease;
 }
 
 .progress-bar-fill.complete {
@@ -246,8 +245,8 @@ body {
 .progress-percentage {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-subtle);
-  min-width: 40px;
+  color: var(--text-secondary);
+  min-width: 38px;
   text-align: right;
 }
 
@@ -261,7 +260,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .subtask-item {
@@ -270,13 +269,13 @@ body {
   justify-content: space-between;
   padding: 8px 10px;
   border-radius: var(--border-radius);
-  background-color: var(--card-bg);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .subtask-item:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--bg-button);
 }
 
 .subtask-left {
@@ -291,15 +290,15 @@ body {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: var(--primary-color);
+  accent-color: var(--accent-color);
 }
 
 .subtask-title-link {
-  color: var(--text-main);
+  color: var(--text-primary);
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -307,34 +306,21 @@ body {
 }
 
 .subtask-title-link:hover {
-  color: var(--primary-color);
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
 .subtask-title-link.completed {
   text-decoration: line-through;
-  color: var(--text-subtle);
-}
-
-.card-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background-color: var(--parent-banner-bg);
-  color: var(--parent-banner-text);
-  border-radius: 3px;
-  padding: 1px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
+  color: var(--text-muted);
 }
 
 .list-name-badge {
   font-size: 11px;
-  color: var(--text-subtle);
-  background-color: var(--progress-track-bg);
-  padding: 1px 6px;
+  color: var(--text-secondary);
+  background-color: var(--tag-bg);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
   border-radius: 3px;
   white-space: nowrap;
 }
@@ -348,7 +334,7 @@ body {
 .subtask-btn {
   background: transparent;
   border: none;
-  color: var(--text-subtle);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px 6px;
   border-radius: var(--border-radius);
@@ -356,66 +342,63 @@ body {
 }
 
 .subtask-btn:hover {
-  background-color: rgba(235, 90, 70, 0.15);
+  background-color: rgba(248, 113, 104, 0.2);
   color: var(--danger-color);
 }
 
-/* Área de Criação de Card e Seleção de Destino */
+/* Área de Criação de Cartão Subtarefa */
 .create-card-section {
-  background-color: var(--card-bg);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: 12px;
+  padding: 10px 12px;
   margin-bottom: 12px;
 }
 
 .create-card-title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
 }
 
 .create-form-fields {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.input-row {
-  display: flex;
   gap: 8px;
 }
 
 .subtask-input {
-  flex-grow: 1;
+  width: 100%;
   height: 36px;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 14px;
+  font-size: 13px;
   outline: none;
-  background-color: var(--input-bg);
-  color: var(--text-main);
-  transition: border-color 0.2s ease;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
 }
 
 .subtask-input:focus {
-  border-color: var(--primary-color);
+  border-color: var(--accent-color);
+}
+
+.subtask-input::placeholder {
+  color: var(--text-muted);
 }
 
 .select-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .destination-label {
   font-size: 12px;
-  color: var(--text-subtle);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -425,75 +408,118 @@ body {
   padding: 4px 8px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 13px;
-  background-color: var(--input-bg);
-  color: var(--text-main);
+  font-size: 12px;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
   outline: none;
   cursor: pointer;
 }
 
 .target-list-select:focus {
-  border-color: var(--primary-color);
+  border-color: var(--accent-color);
 }
 
 .primary-btn {
-  background-color: var(--primary-color);
-  color: #fff;
+  background-color: var(--accent-color);
+  color: var(--accent-text);
   border: none;
   border-radius: var(--border-radius);
-  padding: 8px 14px;
+  padding: 7px 14px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.15s ease;
   white-space: nowrap;
 }
 
 .primary-btn:hover {
-  background-color: var(--primary-hover);
+  opacity: 0.9;
 }
 
 .secondary-btn {
-  background-color: var(--hover-bg);
-  color: var(--text-main);
+  background-color: var(--bg-button);
+  color: var(--text-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: 8px 12px;
+  padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .secondary-btn:hover {
-  background-color: var(--progress-track-bg);
-  border-color: var(--primary-color);
+  background-color: var(--bg-button-hover);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 .bottom-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 8px;
 }
 
-/* Empty state */
-.empty-state {
-  color: var(--text-subtle);
-  font-style: italic;
-  font-size: 13px;
-  padding: 8px 0;
+/* Painel de Token / Configuração */
+.api-config-panel {
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.api-config-panel.hidden {
+  display: none;
+}
+
+.api-config-panel a {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+.api-token-input {
+  width: 100%;
+  padding: 6px 8px;
+  margin: 6px 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+}
+
+.api-token-input::placeholder {
+  color: var(--text-muted);
+}
+
+.toggle-theme-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toggle-theme-btn:hover {
+  color: var(--text-primary);
 }
 
 /* Modal e Popups */
 .modal-body {
   padding: 12px;
-  background-color: var(--card-bg);
-  color: var(--text-main);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
 
 .search-box {
@@ -501,15 +527,15 @@ body {
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: 13px;
+  margin-bottom: 10px;
   outline: none;
-  background-color: var(--input-bg);
-  color: var(--text-main);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .search-box:focus {
-  border-color: var(--primary-color);
+  border-color: var(--accent-color);
 }
 
 .cards-select-list {
@@ -525,7 +551,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background-color: var(--bg-subtle);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -533,13 +559,14 @@ body {
 }
 
 .card-select-item:hover {
-  background-color: var(--hover-bg);
-  border-color: var(--primary-color);
+  background-color: var(--bg-button);
+  border-color: var(--accent-color);
 }
 
 .card-select-title {
   font-weight: 500;
-  color: var(--text-main);
+  color: var(--text-primary);
+  font-size: 13px;
 }
 
 .card-select-meta {
@@ -550,37 +577,12 @@ body {
 
 .card-select-list-name {
   font-size: 11px;
-  color: var(--text-subtle);
+  color: var(--text-secondary);
 }
 
-/* Painel de Configuração de Chave API para criação de cards */
-.api-config-panel {
-  background-color: var(--bg-subtle);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 10px 12px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--text-subtle);
-}
-
-.api-config-panel.hidden {
-  display: none;
-}
-
-.api-config-panel a {
-  color: var(--primary-color);
-  text-decoration: underline;
-}
-
-.api-token-input {
-  width: 100%;
-  padding: 6px 8px;
-  margin: 6px 0;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background-color: var(--input-bg);
-  color: var(--text-main);
-  font-size: 12px;
-  outline: none;
+.empty-state {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 13px;
+  padding: 6px 0;
 }
